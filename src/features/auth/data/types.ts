@@ -11,8 +11,7 @@ export type LoginResponse = {
     token: string
     tokenType: string
     expiresIn: number
+    refreshToken?: string
 }
 
-export type UserRole = 'ADMINISTRADOR' | 'FISIOTERAPEUTA' | 'MEDICO' | 'DESCONOCIDO'
-
-
+export type UserRole = 'ADMINISTRADOR' | 'FISIOTERAPEUTA' | 'MEDICO' | 'UNKNOWN' 

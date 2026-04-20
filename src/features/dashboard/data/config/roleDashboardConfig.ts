@@ -30,7 +30,7 @@ export const ROLE_DASHBOARD_CONFIG: Record<UserRole, RoleDashboardConfig> = {
     actions: ['Evaluar pacientes', 'Emitir diagnostico', 'Definir conductas medicas'],
     accentColor: '#b54708'
   },
-  DESCONOCIDO: {
+  UNKNOWN: {
     title: 'Usuario',
     subtitle: 'No fue posible identificar el rol desde el token.',
     modules: ['Inicio'],

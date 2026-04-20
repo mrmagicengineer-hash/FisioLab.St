@@ -6,6 +6,9 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'
 
 const AUTH_ROLE_STORAGE_KEY = 'auth_role'
+const REFRESH_TOKEN_STORAGE_KEY = 'auth_refresh_token'
+
+
 
 
 export class AuthApiError extends Error {
@@ -148,21 +151,62 @@ function extractRoleFromPayload(payload: Record<string, unknown>): UserRole {
     }
   }
 
-  return 'DESCONOCIDO'
+  return 'UNKNOWN'
+}
+
+const USER_ID_STORAGE_KEY = 'auth_user_id'
+
+function extractUserIdFromPayload(payload: Record<string, unknown>): number | null {
+  // Candidatos estándar JWT: sub, id, userId
+  const candidates = [payload.sub, payload.id, payload.userId, payload.user_id]
+  for (const c of candidates) {
+    if (typeof c === 'number') return c
+    if (typeof c === 'string') {
+      const n = Number(c)
+      if (!Number.isNaN(n) && n > 0) return n
+    }
+  }
+  return null
+}
+
+export function extractUserIdFromToken(token: string): number | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length < 2) return null
+    const payload = JSON.parse(base64UrlDecode(parts[1])) as Record<string, unknown>
+    return extractUserIdFromPayload(payload)
+  } catch {
+    return null
+  }
+}
+
+export function extractNameFromToken(token: string): string | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length < 2) return null
+    const payload = JSON.parse(base64UrlDecode(parts[1])) as Record<string, unknown>
+    for (const key of ['name', 'nombre', 'fullName', 'full_name', 'displayName', 'sub']) {
+      const val = payload[key]
+      if (typeof val === 'string' && val.trim()) return val.trim()
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
 function extractRoleFromToken(token: string): UserRole {
   try {
     const parts = token.split('.')
     if (parts.length < 2) {
-      return 'DESCONOCIDO'
+      return 'UNKNOWN'
     }
 
     const payloadRaw = base64UrlDecode(parts[1])
     const payload = JSON.parse(payloadRaw) as Record<string, unknown>
     return extractRoleFromPayload(payload)
   } catch {
-    return 'DESCONOCIDO'
+    return 'UNKNOWN'
   }
 }
 
@@ -174,6 +218,7 @@ export async function authenticate(credentials: Credentials): Promise<LoginRespo
     },
     body: JSON.stringify(credentials)
   })
+
 
   if (!response.ok) {
     let rawMessage = ''
@@ -192,9 +237,55 @@ export async function authenticate(credentials: Credentials): Promise<LoginRespo
   const data = (await response.json()) as LoginResponse
 
   localStorage.setItem('authToken', data.token)
+
+  const userId = extractUserIdFromToken(data.token)
+  if (userId !== null) {
+    localStorage.setItem(USER_ID_STORAGE_KEY, String(userId))
+  }
+
+  if (data.refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, data.refreshToken)
+  }
+
   localStorage.setItem('auth_token_type', data.tokenType)
   localStorage.setItem('auth_expires_in', data.expiresIn.toString())
   localStorage.setItem(AUTH_ROLE_STORAGE_KEY, extractRoleFromToken(data.token))
 
   return data
+}
+
+export async function refreshAuthToken(): Promise<string> {
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY)
+
+  if (!refreshToken) {
+    throw new Error('Not found refresh token.')
+  }
+
+  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ refreshToken })
+  })
+
+  if (!response.ok) {
+    // Si el refresh token tambien expiro o es invalido, se limpia la sesion
+
+    localStorage.removeItem('authToken')
+    localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY)
+    localStorage.removeItem(AUTH_ROLE_STORAGE_KEY)
+    throw new Error('Failed to refresh token.')
+  }
+  
+
+  const data = (await response.json()) as { token: string, refreshToken?: string }
+  localStorage.setItem('authToken', data.token)
+
+  if(data.refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, data.refreshToken)
+  }
+
+
+  return data.token 
 }

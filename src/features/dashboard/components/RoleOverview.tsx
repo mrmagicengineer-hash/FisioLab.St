@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { UserRole } from '../../auth/data/types'
-import { UI_COLORS } from '../../../theme/palette'
 import { getActiveUsers } from '../data/services/activeUsersService'
 import { getBlockedUsers } from '../data/services/blockedUsersService'
+import { Button } from '@/components/ui/button'
+import { StatusBadge } from './ui/StatusBadge'
 
 type RoleOverviewProps = {
   role: UserRole
@@ -129,27 +130,51 @@ export function RoleOverview({
           <p className="text-xs uppercase tracking-wide text-slate-500">Dashboard</p>
           <h2 className="mt-1 text-2xl font-semibold text-slate-900">Bienvenido, Administrador</h2>
           <p className="mt-1 text-sm text-slate-600">Panel de administracion del sistema · Fisiolab</p>
-          <button
+          <Button
             type="button"
+            variant="outline"
             className="mt-4 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
             onClick={onLogout}
           >
             Cerrar sesion
-          </button>
+          </Button>
         </section>
 
-        <section className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-          <article className="rounded-xl bg-white p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-500">Usuarios activos</p>
-            <p className="mt-1 text-2xl font-bold" style={{ color: UI_COLORS.success }}>{kpis.usuariosActivos}</p>
+        <section className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3" aria-label="Metricas del sistema">
+          <article className="flex items-start gap-4 rounded-xl border-l-4 border-emerald-500 bg-white p-5 shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50" aria-hidden="true">
+              <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Usuarios activos</p>
+              <p className="mt-1 text-3xl font-bold text-emerald-600">{kpis.usuariosActivos}</p>
+            </div>
           </article>
-          <article className="rounded-xl bg-white p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-500">Cuentas bloqueadas</p>
-            <p className="mt-1 text-2xl font-bold" style={{ color: UI_COLORS.danger }}>{kpis.cuentasBloqueadas}</p>
+
+          <article className="flex items-start gap-4 rounded-xl border-l-4 border-red-500 bg-white p-5 shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50" aria-hidden="true">
+              <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Cuentas bloqueadas</p>
+              <p className="mt-1 text-3xl font-bold text-red-600">{kpis.cuentasBloqueadas}</p>
+            </div>
           </article>
-          <article className="rounded-xl bg-white p-4 shadow-sm">
-            <p className="text-xs uppercase text-slate-500">Cuentas desactivadas</p>
-            <p className="mt-1 text-2xl font-bold" style={{ color: UI_COLORS.warning }}>{kpis.cuentasDesactivadas}</p>
+
+          <article className="flex items-start gap-4 rounded-xl border-l-4 border-amber-400 bg-white p-5 shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50" aria-hidden="true">
+              <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Cuentas desactivadas</p>
+              <p className="mt-1 text-3xl font-bold text-amber-600">{kpis.cuentasDesactivadas}</p>
+            </div>
           </article>
         </section>
 
@@ -166,17 +191,12 @@ export function RoleOverview({
                     <p className="text-sm font-medium text-slate-900">{cuenta.nombre}</p>
                     <p className="text-xs text-slate-500">{cuenta.rol}</p>
                   </div>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      cuenta.estado === 'activa'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : cuenta.estado === 'bloqueada'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-slate-100 text-slate-700'
-                    }`}
-                  >
-                    {cuenta.estado}
-                  </span>
+                  <StatusBadge
+                    label={cuenta.estado}
+                    variant={
+                      cuenta.estado === 'activa' ? 'success' : cuenta.estado === 'bloqueada' ? 'error' : 'neutral'
+                    }
+                  />
                 </li>
               ))}
             </ul>
@@ -215,20 +235,21 @@ export function RoleOverview({
       </section>
 
       <div className="mt-4 flex gap-3">
-        <button
+        <Button
           type="button"
+          variant="outline"
           className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
           onClick={onLogout}
         >
           Salir
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           className="rounded-md px-4 py-2 text-sm font-medium text-white"
           style={{ background: accentColor }}
         >
           Ver agenda
-        </button>
+        </Button>
       </div>
     </main>
   )

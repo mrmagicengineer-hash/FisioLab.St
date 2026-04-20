@@ -1,3 +1,5 @@
+import { fetchWithAuth } from '../../../auth/data/services/apiClient'
+
 export type BlockedUserDto = {
   id: number
   cedula: string
@@ -13,37 +15,62 @@ export type BlockedUserDto = {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'
 
-function getAuthHeader(): string {
-  const token = localStorage.getItem('authToken')
-  const tokenType = localStorage.getItem('auth_token_type') ?? 'Bearer'
-
-  if (!token) {
-    throw new Error('No hay sesion activa para consultar usuarios bloqueados.')
+async function extractErrorMessage(response: Response, fallbackMessage: string): Promise<string> {
+  try {
+    const payload = (await response.json()) as { message?: string; error?: string; detail?: string }
+    return payload.message ?? payload.error ?? payload.detail ?? fallbackMessage
+  } catch {
+    return fallbackMessage
   }
-
-  return `${tokenType} ${token}`
 }
 
 export async function getBlockedUsers(): Promise<BlockedUserDto[]> {
-  const response = await fetch(`${API_BASE_URL}/admin/usuarios/bloqueados`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}/admin/usuarios/bloqueados`, {
     method: 'GET',
-    headers: {
-      Authorization: getAuthHeader()
-    }
   })
 
   if (!response.ok) {
-    let message = 'No fue posible cargar los usuarios bloqueados.'
-
-    try {
-      const payload = (await response.json()) as { message?: string; error?: string; detail?: string }
-      message = payload.message ?? payload.error ?? payload.detail ?? message
-    } catch {
-      // fallback to default message
-    }
-
+    const message = await extractErrorMessage(response, 'No fue posible cargar los usuarios bloqueados.')
     throw new Error(message)
   }
 
   return (await response.json()) as BlockedUserDto[]
+}
+
+export async function deactivateTemporaryBlock(userId: number): Promise<void> {
+  const attempts = [
+    {
+      endpoint: `${API_BASE_URL}/admin/usuarios/${userId}/desactivar-bloqueo`,
+      method: 'PATCH'
+    },
+    {
+      endpoint: `${API_BASE_URL}/admin/usuarios/${userId}/desactivar-bloqueo-temporal`,
+      method: 'PATCH'
+    },
+    {
+      endpoint: `${API_BASE_URL}/admin/usuarios/${userId}/desbloquear`,
+      method: 'POST'
+    }
+  ]
+
+  let lastMessage = 'No fue posible desbloquear la cuenta.'
+
+  for (const attempt of attempts) {
+    const response = await fetchWithAuth(attempt.endpoint, {
+      method: attempt.method,
+    })
+
+    if (response.ok) {
+      return
+    }
+
+    if (response.status === 404) {
+      continue
+    }
+
+    lastMessage = await extractErrorMessage(response, lastMessage)
+    throw new Error(lastMessage)
+  }
+
+  throw new Error(lastMessage)
 }

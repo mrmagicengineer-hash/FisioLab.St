@@ -1,3 +1,5 @@
+import { fetchWithAuth } from '../../../auth/data/services/apiClient'
+
 export type ActiveUserDto = {
   id: number
   cedula: string
@@ -13,23 +15,9 @@ export type ActiveUserDto = {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'
 
-function getAuthHeader(): string {
-  const token = localStorage.getItem('authToken')
-  const tokenType = localStorage.getItem('auth_token_type') ?? 'Bearer'
-
-  if (!token) {
-    throw new Error('No hay sesion activa para consultar usuarios.')
-  }
-
-  return `${tokenType} ${token}`
-}
-
 export async function getActiveUsers(): Promise<ActiveUserDto[]> {
-  const response = await fetch(`${API_BASE_URL}/admin/usuarios/activos`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}/admin/usuarios/activos`, {
     method: 'GET',
-    headers: {
-      Authorization: getAuthHeader()
-    }
   })
 
   if (!response.ok) {

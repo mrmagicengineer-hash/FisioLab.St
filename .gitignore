@@ -17,8 +17,31 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.*
+
+# Coverage reports
+coverage/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
