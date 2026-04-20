@@ -4,7 +4,6 @@ import type {
   ContextoAgendamientoResponse,
   ContextoAgendamientoEpisodio,
   ContextoAgendamientoPlan,
-  ApiContextoAgendamientoResponse,
   ApiContextoEpisodio,
   ApiContextoPlan,
 } from '../types'
@@ -59,7 +58,7 @@ function normalizeResponse(raw: unknown): ContextoAgendamientoResponse {
 
   if (Array.isArray(raw)) {
     const arr = raw as ApiContextoEpisodio[]
-    const first = arr[0] as Record<string, unknown> | undefined
+    const first = arr[0] as unknown as Record<string, unknown> | undefined
     if (first && 'episodioId' in first) {
       return { episodios: arr.map(mapEpisodio) }
     }

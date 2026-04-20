@@ -14,7 +14,8 @@ export function SessionTemplateSelector() {
   const { templateId, setTemplateId, setCosto, setModalidades, status } = useSessionEditor()
   const locked = status === 'locked'
 
-  const handleChange = (id: string) => {
+  const handleChange = (id: string | null) => {
+    if (!id) return
     const tpl = SESSION_TEMPLATES.find((t) => t.id === id)
     if (!tpl) return
 

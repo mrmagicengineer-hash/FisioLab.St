@@ -85,9 +85,11 @@ export function TherapySessionPage() {
   }
 
   function handleNavigateToRecord() {
-    window.dispatchEvent(
-      new CustomEvent('therapy:navigate-to-record', { detail: { patientId: patient.id } })
-    )
+    if (patient) {
+      window.dispatchEvent(
+        new CustomEvent('therapy:navigate-to-record', { detail: { patientId: patient.id } })
+      )
+    }
   }
 
   return (

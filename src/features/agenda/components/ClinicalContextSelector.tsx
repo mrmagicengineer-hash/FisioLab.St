@@ -10,7 +10,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { usePatientContext } from '../data/hooks/usePatientContext'
 import { SessionProgressIndicator } from './SessionProgressIndicator'
-import type { ContextoAgendamientoPlan } from '../data/types'
+
 
 interface ClinicalContextSelectorProps {
   patientId: number | null
@@ -69,7 +69,7 @@ export function ClinicalContextSelector({
   const selectedEpisode = data.episodios.find(e => String(e.id) === episodioId)
   const selectedPlan = selectedEpisode?.planes.find(p => String(p.id) === planId)
 
-  const handleEpisodioChange = (value: string) => {
+  const handleEpisodioChange = (value: string | null) => {
     if (value === 'none') {
       onChangeEpisodio('', '')
       onChangePlan(undefined, undefined)
@@ -87,7 +87,7 @@ export function ClinicalContextSelector({
     }
   }
 
-  const handlePlanChange = (value: string) => {
+  const handlePlanChange = (value: string | null) => {
     if (value === 'none') {
       onChangePlan(undefined, undefined)
       return

@@ -77,7 +77,7 @@ function SessionProgressBar({
   estado: string
 }) {
   const isClosed = estado === 'CERRADO' || estado === 'ALTA' || estado === 'ABANDONO'
-  const pct = planificadas > 0 ? Math.round((completadas / planificadas) * 100) : 0
+  // const pct = planificadas > 0 ? Math.round((completadas / planificadas) * 100) : 0
   const overrun = completadas > planificadas
 
   return (
@@ -395,7 +395,7 @@ type Props = {
 export function PlanProgressCard({
   episodioId,
   problemaId,
-  problemaDescripcion,
+  // problemaDescripcion,
   numeroEpisodio,
   planFromCache,
   onPlanCreated,

@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { useSessionEditor } from '../../context/SessionEditorContext'
 import { MODALIDADES_CATALOG } from '../../data/types'
-import type { Modalidad } from '../../data/types'
 import { PlusIcon, XIcon } from 'lucide-react'
 
 function randomId() {

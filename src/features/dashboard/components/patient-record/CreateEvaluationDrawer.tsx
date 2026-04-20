@@ -136,12 +136,6 @@ const imcLabel = (imc: string): string => {
   return 'Obesidad'
 }
 
-const evaColor = (v: number): string => {
-  if (v <= 3) return 'bg-emerald-500'
-  if (v <= 5) return 'bg-yellow-400'
-  if (v <= 7) return 'bg-orange-500'
-  return 'bg-red-600'
-}
 
 const evaTextColor = (v: number): string => {
   if (v <= 3) return 'text-emerald-700 bg-emerald-50'

@@ -4,12 +4,15 @@ import type { TherapySession, EvolutionNote, SesionTerapiaResponse, ResumenProgr
 const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'
 
 export class TherapySessionApiError extends Error {
+  readonly status: number;
+
   constructor(
     message: string,
-    public readonly status: number
+    status: number
   ) {
     super(message)
     this.name = 'TherapySessionApiError'
+    this.status = status
   }
 }
 

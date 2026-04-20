@@ -392,7 +392,7 @@ export function AppointmentQuickModal({
                   {selectedEpisode.planes.length > 1 ? (
                     <Select
                       value={form.planId ?? 'none'}
-                      onValueChange={(v) => set('planId', v === 'none' ? undefined : v)}
+                      onValueChange={(v: string | null) => set('planId', v === 'none' ? undefined : v ?? undefined)}
                     >
                       <SelectTrigger className="h-9 text-xs">
                         <SelectValue placeholder="Sin plan específico" />
