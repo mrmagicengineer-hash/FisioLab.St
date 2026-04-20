@@ -1,3 +1,66 @@
+# Secret/credential files
+.envrc
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.npmrc
+.yarnrc
+.pnp.*
+.cache/
+.firebase/
+.firebaserc
+.secret
+.secrets/
+.ssh/
+.key
+.pem
+.crt
+.cert
+.certs/
+.keystore
+.jks
+.p12
+.pfx
+.bak
+.backup
+.tmp
+.temp
+.swp
+.swo
+.idea/
+.vscode/
+.history/
+.DS_Store
+Thumbs.db
+# Ignore test coverage, reports, and misc
+coverage/
+*.lcov
+*.lcov.info
+*.nyc_output/
+*.coverage
+*.log
+logs/
+debug.log
+error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Ignore build outputs
+dist/
+build/
+out/
+tmp/
+temp/
+
+# Ignore OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
 # Logs
 logs
 *.log
